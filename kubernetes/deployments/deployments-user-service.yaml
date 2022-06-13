@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+  name: user-service-service
+  labels:
+    app: user-service-service
+spec:
+  type: NodePort
+  ports:
+  - port: 8000
+    name: user-service-service
+    targetPort: 8000
+  selector:
+    app: user-service-service
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service-deployment
+  labels:
+    app: user-service-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-service-deployment
+  template:
+    metadata:
+      labels:
+        app: user-service-deployment
+    spec:
+      containers:
+      - name: housingo
+        image: gcr.io/housingo-350313/user-service:staging
+        imagePullPolicy: Always
+        env:
+        - name: DB_STRING 
+          value: ${{ secrets.DB_STRING }}
+        - name: PORT
+          value: "8000"
+        - name: JWT_SECRET
+          value: ${{ secrets.JWT_SECRET }}
+        ports:
+        - containerPort: 8000
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "250m"

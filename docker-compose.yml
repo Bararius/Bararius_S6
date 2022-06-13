@@ -1,0 +1,25 @@
+version: '2'
+services:
+  user-service:
+    build: ./user-service
+    hostname: localhost
+    restart: always
+    ports:
+      - "8000:8000"
+    image: davidcopoeru/user-service
+    networks:
+      - bararius
+
+  listing-service:
+    build: ./listing-service
+    hostname: localhost
+    restart: always
+    ports:
+      - "8001:8001"
+    image: davidcopoeru/user-service
+    networks:
+      - bararius
+
+networks:
+  bararius:
+    driver: bridge

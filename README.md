@@ -1,1 +1,1 @@
-# Bararius_S6
+# individual_project_s6
