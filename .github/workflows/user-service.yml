@@ -11,7 +11,7 @@ env:
   SERVICE_NAME: user-service
   PROJECT_ID: focal-dolphin-259611
   GKE_ZONE: us-central1
-  DEPLOYMENT_NAME: user-service-deployment
+  DEPLOYMENT_NAME: user-service
   GKE_CLUSTER: bararius
 
 jobs:
