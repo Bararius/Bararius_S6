@@ -1,0 +1,79 @@
+name: UserService Pipeline
+on:
+  push:
+    paths:
+      - user-service/**
+      - .github/workflows/user-service.yml
+      - .github/workflows/composite/build/action.yml
+      - .github/workflows/composite/deploy/action.yml
+
+env:
+  SERVICE_NAME: user-service
+  PROJECT_ID: focal-dolphin-259611
+  GKE_ZONE: us-central1
+  DEPLOYMENT_NAME: user-service-deployment
+  GKE_CLUSTER: bararius
+
+jobs:
+  testing:
+
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.8", "3.9", "3.10"]
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install flake8 pytest
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    # - name: Lint with flake8
+    #   run: |
+    #     # stop the build if there are Python syntax errors or undefined names
+    #     flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+    #     # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+    #     flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    # - name: Test with pytest rerun
+    #   run: |
+    #     pytest
+  
+  build:
+    needs: [testing]
+    if: success()
+    name: Build staging
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v1
+
+      - name: Build and Push
+        uses: ./.github/workflows/composite/build
+        with:
+          service_name: user-service
+          project_id: ${{ secrets.GOOGLE_CONTAINER_PROJECT_ID }}
+          registry_token: ${{ secrets.GOOGLE_CONTAINER_REGISTRY_TOKEN }}
+
+  deploy:
+    needs: [build]
+    if: success()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v1
+
+      - name: Deploy to GKE
+        uses: ./.github/workflows/composite/deploy
+        with:
+          service_account_key: ${{ secrets.GOOGLE_KUBERNETES_SERVICE_ACCOUNT }}
+          project_id: ${{ secrets.GOOGLE_CONTAINER_PROJECT_ID }}
+          cluster_name: ${{ env.GKE_CLUSTER }}
+          location: ${{ env.GKE_ZONE }}
+          credentials: ${{ secrets.GOOGLE_KUBERNETES_SERVICE_ACCOUNT }}
+          deploy_name: ${{ env.DEPLOYMENT_NAME }}

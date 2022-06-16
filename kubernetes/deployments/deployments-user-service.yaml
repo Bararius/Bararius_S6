@@ -33,16 +33,9 @@ spec:
         app: user-service-deployment
     spec:
       containers:
-      - name: housingo
-        image: gcr.io/housingo-350313/user-service:staging
+      - name: bararius
+        image: gcr.io/focal-dolphin-259611/user-service
         imagePullPolicy: Always
-        env:
-        - name: DB_STRING 
-          value: ${{ secrets.DB_STRING }}
-        - name: PORT
-          value: "8000"
-        - name: JWT_SECRET
-          value: ${{ secrets.JWT_SECRET }}
         ports:
         - containerPort: 8000
         resources:

@@ -1,0 +1,42 @@
+name: "Deploy Image"
+description: "Deploys a docker image to Google Kubernetes Engine"
+
+inputs:
+  service_account_key:
+    required: true
+    description: ""
+  project_id:
+    required: true
+    description: ""
+  cluster_name:
+    required: true
+    description: ""
+  location:
+    required: true
+    description: ""
+  credentials:
+    required: true
+    description: ""
+  deploy_name:
+    required: true
+    description: ""
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup gcloud CLI
+      uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
+      with:
+        service_account_key: ${{ inputs.service_account_key }}
+        project_id: ${{ inputs.project_id }}
+
+    - name: Login to GKE
+      uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
+      with:
+        cluster_name: ${{ inputs.cluster_name }}
+        location: ${{ inputs.location }}
+        credentials: ${{ inputs.credentials }}
+
+    - name: Deploy to GKE
+      shell: bash
+      run: kubectl rollout restart deploy ${{ inputs.deploy_name }}

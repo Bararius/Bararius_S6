@@ -118,9 +118,9 @@ def create(user: UserGoogle):
 #     return Listing.get(pk)
 
 
-# @app.delete('/listings/{pk}', tags=["Listing Service"], summary="Delete a specific listing based on the primarykey")
-# def delete(pk: str):
-#     return Listing.delete(pk)
+@app.delete('/users/{pk}', tags=["USer Service"], summary="Delete a specific user based on the primarykey")
+def delete(pk: str):
+    return User.delete(pk)
 
 
 # @app.put('/listings/rented/{pk}', tags=["Listing Service"], summary="Update the renting status of a specific listing based on the primarykey")
