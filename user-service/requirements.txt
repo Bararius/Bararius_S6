@@ -1,4 +1,5 @@
 fastapi==0.78.0
+pika==1.2.1
 pydantic==1.9.1
 redis_om==0.0.27
 requests==2.22.0
