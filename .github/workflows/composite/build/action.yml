@@ -27,4 +27,4 @@ runs:
       with:
         push: true
         context: ./${{ inputs.service_name }}
-        tags: gcr.io/focal-dolphin-259611/user-service
+        tags: gcr.io/focal-dolphin-259611/${{ inputs.service_name }}
